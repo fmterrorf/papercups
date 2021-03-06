@@ -1,7 +1,8 @@
 defmodule ChatApiWeb.ConversationControllerTest do
-  use ChatApiWeb.ConnCase, async: true
+  use ChatApiWeb.ConnCase, async: false
 
   import ChatApi.Factory
+  import Mock
   alias ChatApi.Conversations.Conversation
 
   @update_attrs %{
@@ -9,7 +10,17 @@ defmodule ChatApiWeb.ConversationControllerTest do
   }
   @invalid_attrs %{status: nil}
 
-  setup %{conn: conn} do
+  setup_with_mocks(
+    [
+      {ChatApi.Conversations.Notification, [:passthrough],
+       [
+         notify: fn conversation, _ ->
+           conversation
+         end
+       ]}
+    ],
+    %{conn: conn}
+  ) do
     account = insert(:account)
     user = insert(:user, account: account, email: "test@example.com")
     customer = insert(:customer, account: account)

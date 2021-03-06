@@ -1,5 +1,5 @@
 defmodule ChatApiWeb.SlackControllerTest do
-  use ChatApiWeb.ConnCase, async: true
+  use ChatApiWeb.ConnCase, async: false
 
   import ChatApi.Factory
   import Mock
@@ -10,7 +10,15 @@ defmodule ChatApiWeb.SlackControllerTest do
   @email "customer@test.com"
   @slack_channel "#test"
 
-  setup %{conn: conn} do
+  setup_with_mocks(
+    [
+      {ChatApi.Conversations.Notification, [:passthrough],
+       [
+         notify: fn conversation, _ -> conversation end
+       ]}
+    ],
+    %{conn: conn}
+  ) do
     account = insert(:account)
     user = insert(:user, account: account)
     customer = insert(:customer, account: account, email: @email)

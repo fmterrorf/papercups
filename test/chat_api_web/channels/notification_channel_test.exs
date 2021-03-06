@@ -1,11 +1,27 @@
 defmodule ChatApiWeb.NotificationChannelTest do
   use ChatApiWeb.ChannelCase
   import ChatApi.Factory
+  import Mock
 
   alias ChatApi.Conversations
   alias ChatApi.Conversations.Conversation
 
-  setup do
+  setup_with_mocks([
+    {ChatApi.Conversations.Notification, [:passthrough],
+     [
+       notify: fn conversation, _ -> conversation end
+     ]},
+    {ChatApi.Slack.Notification, [:passthrough],
+     [
+       notify_primary_channel: fn _ -> :ok end
+     ]},
+    {ChatApi.Messages.Notification, [:passthrough],
+     [
+       notify: fn conversation, _any ->
+         conversation
+       end
+     ]}
+  ]) do
     account = insert(:account)
     user = insert(:user, account: account)
     conversation = insert(:conversation, account: account)

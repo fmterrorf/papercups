@@ -54,6 +54,7 @@ defmodule ChatApi.Conversations.Notification do
   def notify(conversation, type, opts \\ [])
 
   def notify(%Conversation{account_id: account_id} = conversation, :webhooks, event: event) do
+    # IO.inspect(Process.info(self(), :current_stacktrace))
     Logger.info("Sending conversation notification: :webhooks")
 
     Task.start(fn ->
@@ -67,6 +68,8 @@ defmodule ChatApi.Conversations.Notification do
   end
 
   def notify(%Conversation{} = conversation, :slack, _opts) do
+    # IO.inspect(Process.info(self(), :current_stacktrace))
+
     Logger.info("Sending conversation notification: :slack")
 
     Task.start(fn ->
